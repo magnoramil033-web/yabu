@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YABU Restaurant Management System</title>
+</head>
+<body>
+
+    <header>
+        <h1>YABU</h1>
+        <p>THE HOUSE OF KATSU</p>
+        <p>Restaurant Management System</p>
+    </header>
+
+    <nav id="nav">
+        <button data-page="dashboard">Dashboard</button>
+        <button data-page="tables">Tables</button>
+        <button data-page="orders">Orders</button>
+        <button data-page="menu">Menu</button>
+        <button data-page="inventory">Inventory</button>
+        <button data-page="reports">Reports</button>
+        <button data-page="employees">Employees</button>
+        <button data-page="settings">Settings</button>
+    </nav>
+
+    <main>
+        <input id="search" placeholder="Search orders, menu, inventory">
+
+        <section id="dashboard" class="page">
+            <h2>Dashboard</h2>
+            <p>Welcome back! Here's what's happening today.</p>
+
+            <button onclick="show('orders')">New Order</button>
+
+            <h3>Sales Overview</h3>
+            <div id="sales"></div>
+
+            <h3>Recent Orders</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Table</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recent"></tbody>
+            </table>
+        </section>
+
+        <section id="tables" class="page" hidden>
+            <h2>Table Management</h2>
+            <p>Manage table availability and occupancy.</p>
+
+            <div id="tableStats"></div>
+            <div id="tableGrid"></div>
+        </section>
+
+        <section id="orders" class="page" hidden>
+            <h2>Order Management</h2>
+            <p>Track and manage customer orders.</p>
+
+            <button onclick="addOrder()">Add Order</button>
+
+            <form id="orderForm">
+                <h3>New Customer Order</h3>
+
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" required>
+
+                <br><br>
+
+                <label for="orderTable">Select Table:</label>
+                <select id="orderTable" required></select>
+
+                <br><br>
+
+                <label for="orderMenu">Select Menu Item:</label>
+                <select id="orderMenu" required></select>
+
+                <br><br>
+
+                <label for="orderQuantity">Quantity:</label>
+                <input type="number" id="orderQuantity" min="1" value="1" required>
+
+                <br><br>
+
+                <button type="submit">Place Order</button>
+            </form>
+
+            <h3>Customer Orders</h3>
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Table</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="orderRows"></tbody>
+            </table>
+        </section>
+
+        <section id="menu" class="page" hidden>
+            <h2>Menu</h2>
+            <div id="menuGrid"></div>
+        </section>
+
+        <section id="inventory" class="page" hidden>
+            <h2>Inventory</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="stockRows"></tbody>
+            </table>
+        </section>
+
+        <section id="reports" class="page" hidden>
+            <h2>Reports</h2>
+            <p>Weekly Sales Summary</p>
+            <div id="reportStats"></div>
+            <div id="reportBars"></div>
+            <button onclick="window.print()">Print Report</button>
+        </section>
+
+        <section id="employees" class="page" hidden>
+            <h2>Employees</h2>
+            <div id="employeeRows"></div>
+        </section>
+
+        <section id="settings" class="page" hidden>
+            <h2>Settings</h2>
+            <p>Restaurant Name: YABU</p>
+            <p>Currency: Philippine Peso (PHP)</p>
+            <p>Order Management: Enabled</p>
+            <p>Table Management: Enabled</p>
+            <button onclick="alert('Settings saved for this demo session.')">
+                Save Settings
+            </button>
+        </section>
+    </main>
+
+    <!-- JSON DATA -->
+    <script type="application/json" id="yabuJSON">
+    {
+        "menu": [
+            {
+                "id": 1,
+                "name": "Rosu Pork Loin Set",
+                "category": "Katsu Set",
+                "price": 450,
+                "icon": "🍱"
+            },
+            {
+                "id": 2,
+                "name": "Chicken Katsu Set",
+                "category": "Katsu Set",
+                "price": 425,
+                "icon": "🍗"
+            },
+            {
+                "id": 3,
+                "name": "Cream Dory Katsu",
+                "category": "Seafood",
+                "price": 435,
+                "icon": "🐟"
+            },
+            {
+                "id": 4,
+                "name": "Prawn Katsu Set",
+                "category": "Seafood",
+                "price": 640,
+                "icon": "🍤"
+            },
+            {
+                "id": 5,
+                "name": "Rosu Katsu Curry",
+                "category": "Curry",
+                "price": 510,
+                "icon": "🍛"
+            }
+        ],
+        "orders": [
+            {
+                "id": "ORD-00379",
+                "customer": "Maria Santos",
+                "table": 3,
+                "items": 2,
+                "total": 950,
+                "status": "Preparing",
+                "details": [
+                    {"name": "Rosu Pork Loin Set", "quantity": 1, "price": 450},
+                    {"name": "Chicken Katsu Set", "quantity": 1, "price": 425}
+                ]
+            },
+            {
+                "id": "ORD-00378",
+                "customer": "Juan Dela Cruz",
+                "table": 5,
+                "items": 3,
+                "total": 1280,
+                "status": "Served",
+                "details": []
+            },
+            {
+                "id": "ORD-00377",
+                "customer": "Angela Reyes",
+                "table": 1,
+                "items": 1,
+                "total": 450,
+                "status": "Pending",
+                "details": [
+                    {"name": "Rosu Pork Loin Set", "quantity": 1, "price": 450}
+                ]
+            }
+        ],
+        "tables": [
+            {"number": 1, "status": "Occupied"},
+            {"number": 2, "status": "Available"},
+            {"number": 3, "status": "Occupied"},
+            {"number": 4, "status": "Available"},
+            {"number": 5, "status": "Reserved"},
+            {"number": 6, "status": "Available"},
+            {"number": 7, "status": "Occupied"},
+            {"number": 8, "status": "Available"},
+            {"number": 9, "status": "Available"},
+            {"number": 10, "status": "Available"},
+            {"number": 11, "status": "Available"},
+            {"number": 12, "status": "Available"},
+            {"number": 13, "status": "Available"},
+            {"number": 14, "status": "Available"},
+            {"number": 15, "status": "Available"}
+        ],
+        "inventory": [
+            {
+                "name": "Pork Loin",
+                "category": "Meat",
+                "quantity": 24,
+                "status": "In Stock"
+            },
+            {
+                "name": "Chicken",
+                "category": "Meat",
+                "quantity": 18,
+                "status": "In Stock"
+            },
+            {
+                "name": "Rice",
+                "category": "Dry Goods",
+                "quantity": 9,
+                "status": "Low Stock"
+            }
+        ],
+        "employees": [
+            {
+                "name": "Alex Rivera",
+                "role": "Manager",
+                "status": "Active"
+            },
+            {
+                "name": "Jamie Cruz",
+                "role": "Cashier",
+                "status": "Active"
+            }
+        ],
+        "sales": [
+            {"day": "Mon", "amount": 4200},
+            {"day": "Tue", "amount": 6100},
+            {"day": "Wed", "amount": 5200},
+            {"day": "Thu", "amount": 7800},
+            {"day": "Fri", "amount": 9600},
+            {"day": "Sat", "amount": 8200},
+            {"day": "Sun", "amount": 11200}
+        ]
+    }
+    </script>
+
+    <script>
+    // Read the JSON data
+    const data = JSON.parse(
+        document.getElementById("yabuJSON").textContent
+    );
+
+    const money = amount =>
+        "₱" + Number(amount).toLocaleString("en-PH", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+    let nextOrderNumber = 380;
+
+    // Switch pages
+    function show(pageId) {
+        document.querySelectorAll(".page").forEach(page => {
+            page.hidden = page.id !== pageId;
+        });
+
+        if (pageId === "tables") renderTables();
+        if (pageId === "orders") {
+            renderOrders();
+            renderOrderTableOptions();
+        }
+    }
+
+    document.getElementById("nav").addEventListener("click", event => {
+        const button = event.target.closest("button[data-page]");
+
+        if (button) {
+            show(button.dataset.page);
+        }
+    });
+
+    // Render orders
+    function renderOrders() {
+        document.getElementById("orderRows").innerHTML =
+            data.orders.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${escapeHTML(order.customer)}</td>
+                    <td>Table ${order.table}</td>
+                    <td>${order.items}</td>
+                    <td>${money(order.total)}</td>
+                    <td>${order.status}</td>
+                    <td>
+                        ${order.status !== "Served" && order.status !== "Cancelled"
+                            ? `<button onclick="updateOrderStatus('${order.id}', 'Preparing')">Preparing</button>
+                               <button onclick="updateOrderStatus('${order.id}', 'Served')">Served</button>
+                               <button onclick="updateOrderStatus('${order.id}', 'Cancelled')">Cancel</button>`
+                            : order.status}
+                    </td>
+                </tr>
+            `).join("");
+
+        document.getElementById("recent").innerHTML =
+            data.orders.slice(0, 4).map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.table}</td>
+                    <td>${money(order.total)}</td>
+                    <td>${order.status}</td>
+                </tr>
+            `).join("");
+    }
+
+    function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    // Display menu
+    function renderMenu() {
+        document.getElementById("menuGrid").innerHTML =
+            data.menu.map(item => `
+                <div>
+                    <h3>${item.icon} ${escapeHTML(item.name)}</h3>
+                    <p>Category: ${escapeHTML(item.category)}</p>
+                    <p>Price: ${money(item.price)}</p>
+                </div>
+            `).join("");
+    }
+
+    // Display table information and counts
+    function renderTables() {
+        const statuses = ["Available", "Occupied", "Reserved", "Cleaning"];
+
+        const counts = Object.fromEntries(
+            statuses.map(status => [
+                status,
+                data.tables.filter(table => table.status === status).length
+            ])
+        );
+
+        document.getElementById("tableStats").innerHTML = `
+            <p>Total Tables: ${data.tables.length}</p>
+            <p>Available: ${counts.Available}</p>
+            <p>Occupied: ${counts.Occupied}</p>
+            <p>Reserved: ${counts.Reserved}</p>
+            <p>Cleaning: ${counts.Cleaning}</p>
+            <label for="tableStatusFilter">Filter Tables:</label>
+            <select id="tableStatusFilter" onchange="renderTableGrid()">
+                <option value="All">All Statuses</option>
+                ${statuses.map(status =>
+                    `<option value="${status}">${status}</option>`
+                ).join("")}
+            </select>
+        `;
+
+        renderTableGrid();
+        renderOrderTableOptions();
+    }
+
+    function renderTableGrid() {
+        const filter = document.getElementById("tableStatusFilter")?.value || "All";
+
+        document.getElementById("tableGrid").innerHTML =
+            data.tables
+                .filter(table => filter === "All" || table.status === filter)
+                .map(table => `
+                    <div>
+                        <h3>Table ${table.number}</h3>
+                        <p>Current Status: ${table.status}</p>
+                        <label for="table-${table.number}">Change Status:</label>
+                        <select id="table-${table.number}"
+                                onchange="changeTableStatus(${table.number}, this.value)">
+                            ${["Available", "Occupied", "Reserved", "Cleaning"]
+                                .map(status => `
+                                    <option value="${status}"
+                                        ${table.status === status ? "selected" : ""}>
+                                        ${status}
+                                    </option>
+                                `).join("")}
+                        </select>
+                    </div>
+                    <hr>
+                `).join("");
+    }
+
+    function changeTableStatus(number, newStatus) {
+        const table = data.tables.find(item => item.number === number);
+        if (!table) return;
+
+        const hasActiveOrder = data.orders.some(order =>
+            order.table === number &&
+            !["Served", "Cancelled"].includes(order.status)
+        );
+
+        if (hasActiveOrder && ["Available", "Reserved", "Cleaning"].includes(newStatus)) {
+            alert("This table has an active order. Mark the order as Served or Cancelled first.");
+            renderTables();
+            return;
+        }
+
+        table.status = newStatus;
+        renderTables();
+    }
+
+    // Fill the table dropdown with available tables
+    function renderOrderTableOptions() {
+        const select = document.getElementById("orderTable");
+        if (!select) return;
+
+        const previousValue = select.value;
+        select.innerHTML = '<option value="">Select an available table</option>';
+
+        data.tables
+            .filter(table => table.status === "Available")
+            .forEach(table => {
+                const option = document.createElement("option");
+                option.value = table.number;
+                option.textContent = "Table " + table.number;
+                select.appendChild(option);
+            });
+
+        if ([...select.options].some(option => option.value === previousValue)) {
+            select.value = previousValue;
+        }
+    }
+
+    // Fill the menu dropdown
+    function renderOrderMenuOptions() {
+        document.getElementById("orderMenu").innerHTML =
+            data.menu.map(item => `
+                <option value="${item.id}">
+                    ${item.name} - ${money(item.price)}
+                </option>
+            `).join("");
+    }
+
+    // Add an order from the form
+    document.getElementById("orderForm").addEventListener("submit", event => {
+        event.preventDefault();
+
+        const customer = document.getElementById("customerName").value.trim();
+        const tableNumber = Number(document.getElementById("orderTable").value);
+        const menuId = Number(document.getElementById("orderMenu").value);
+        const quantity = Number(document.getElementById("orderQuantity").value);
+
+        const table = data.tables.find(item => item.number === tableNumber);
+        const menuItem = data.menu.find(item => item.id === menuId);
+
+        if (!customer || !table || !menuItem) {
+            alert("Please enter the customer name and select a table and menu item.");
+            return;
+        }
+
+        if (table.status !== "Available") {
+            alert("Please select an available table.");
+            renderOrderTableOptions();
+            return;
+        }
+
+        if (!Number.isInteger(quantity) || quantity < 1) {
+            alert("Quantity must be at least 1.");
+            return;
+        }
+
+        const order = {
+            id: "ORD-" + String(nextOrderNumber++).padStart(5, "0"),
+            customer,
+            table: tableNumber,
+            items: quantity,
+            total: menuItem.price * quantity,
+            status: "Pending",
+            details: [{
+                name: menuItem.name,
+                quantity,
+                price: menuItem.price
+            }]
+        };
+
+        data.orders.unshift(order);
+
+        // Automatically occupy the selected table.
+        table.status = "Occupied";
+
+        event.target.reset();
+        document.getElementById("orderQuantity").value = 1;
+
+        renderOrders();
+        renderTables();
+        renderOrderTableOptions();
+
+        alert("Order placed successfully!");
+    });
+
+    // Update order status
+    function updateOrderStatus(orderId, newStatus) {
+        const order = data.orders.find(item => item.id === orderId);
+        if (!order) return;
+
+        order.status = newStatus;
+
+        const table = data.tables.find(item => item.number === order.table);
+
+        if (table) {
+            const hasOtherActiveOrders = data.orders.some(item =>
+                item.table === order.table &&
+                item.id !== order.id &&
+                !["Served", "Cancelled"].includes(item.status)
+            );
+
+            if (newStatus === "Served" && !hasOtherActiveOrders) {
+                table.status = "Cleaning";
+            }
+
+            if (newStatus === "Cancelled" && !hasOtherActiveOrders) {
+                table.status = "Available";
+            }
+        }
+
+        renderOrders();
+        renderTables();
+    }
+
+    // Keep the Add Order button, but open the real order form.
+    function addOrder() {
+        show("orders");
+        document.getElementById("customerName").focus();
+    }
+
+    // Display inventory
+    function renderInventory() {
+        document.getElementById("stockRows").innerHTML =
+            data.inventory.map(item => `
+                <tr>
+                    <td>${escapeHTML(item.name)}</td>
+                    <td>${escapeHTML(item.category)}</td>
+                    <td>${item.quantity}</td>
+                    <td>${escapeHTML(item.status)}</td>
+                </tr>
+            `).join("");
+    }
+
+    // Display employees
+    function renderEmployees() {
+        document.getElementById("employeeRows").innerHTML =
+            data.employees.map(employee => `
+                <p>
+                    ${escapeHTML(employee.name)} -
+                    ${escapeHTML(employee.role)} -
+                    ${escapeHTML(employee.status)}
+                </p>
+            `).join("");
+    }
+
+    // Display sales summary
+    function renderSales() {
+        document.getElementById("sales").innerHTML =
+            data.sales.map(item => `
+                <p>${item.day}: ${money(item.amount)}</p>
+            `).join("");
+
+        const total = data.sales.reduce(
+            (sum, item) => sum + item.amount, 0
+        );
+
+        document.getElementById("reportStats").innerHTML = `
+            <p>Total Weekly Sales: ${money(total)}</p>
+            <p>Total Menu Items: ${data.menu.length}</p>
+            <p>Total Tables: ${data.tables.length}</p>
+            <p>Total Orders: ${data.orders.length}</p>
+        `;
+
+        document.getElementById("reportBars").innerHTML =
+            data.sales.map(item => `
+                <p>${item.day}: ${money(item.amount)}</p>
+            `).join("");
+    }
+
+    // Search orders, menu, inventory, and employees
+    document.getElementById("search").addEventListener("input", event => {
+        const query = event.target.value.toLowerCase();
+
+        document.querySelectorAll(
+            "#orderRows tr, #menuGrid div, #stockRows tr, #employeeRows p"
+        ).forEach(item => {
+            item.hidden = !item.textContent.toLowerCase().includes(query);
+        });
+    });
+
+    // Load the page
+    renderOrders();
+    renderMenu();
+    renderTables();
+    renderOrderMenuOptions();
+    renderInventory();
+    renderEmployees();
+    renderSales();
+    show("dashboard");
+    </script>
+</body>
+</html>
