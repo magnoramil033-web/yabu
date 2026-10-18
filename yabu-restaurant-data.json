@@ -1,0 +1,620 @@
+{
+  "settings": {
+    "restaurantName": "YABU: House of Katsu",
+    "currency": "PHP"
+  },
+  "menu": [
+    {
+      "id": 1,
+      "name": "Rosu Katsu Set",
+      "category": "Best Seller",
+      "price": 390
+    },
+    {
+      "id": 2,
+      "name": "Chicken Katsu Set",
+      "category": "Best Seller",
+      "price": 375
+    },
+    {
+      "id": 3,
+      "name": "Rosu Katsu Curry",
+      "category": "Best Seller",
+      "price": 475
+    },
+    {
+      "id": 4,
+      "name": "Chicken Katsu Curry",
+      "category": "Katsu",
+      "price": 450
+    },
+    {
+      "id": 5,
+      "name": "Hire Katsu Set",
+      "category": "Katsu",
+      "price": 415
+    },
+    {
+      "id": 6,
+      "name": "Pork Katsu Set",
+      "category": "Katsu",
+      "price": 430
+    },
+    {
+      "id": 7,
+      "name": "Menchi Katsu Set",
+      "category": "Katsu",
+      "price": 475
+    },
+    {
+      "id": 8,
+      "name": "Ebi Fry Set",
+      "category": "Katsu",
+      "price": 490
+    },
+    {
+      "id": 9,
+      "name": "Cream Dory Katsu",
+      "category": "Katsu",
+      "price": 465
+    },
+    {
+      "id": 10,
+      "name": "Rosu Katsudon",
+      "category": "Katsu",
+      "price": 475
+    },
+    {
+      "id": 11,
+      "name": "Chicken Katsudon",
+      "category": "Katsu",
+      "price": 455
+    },
+    {
+      "id": 12,
+      "name": "Hire Katsu Curry",
+      "category": "Katsu",
+      "price": 495
+    },
+    {
+      "id": 13,
+      "name": "Deluxe Mixed Katsu",
+      "category": "Katsu",
+      "price": 715
+    },
+    {
+      "id": 14,
+      "name": "Salmon Katsu Set",
+      "category": "Katsu",
+      "price": 655
+    },
+    {
+      "id": 15,
+      "name": "Prawn Katsu Set",
+      "category": "Katsu",
+      "price": 610
+    },
+    {
+      "id": 16,
+      "name": "White Japanese Rice",
+      "category": "Sides",
+      "price": 95
+    },
+    {
+      "id": 17,
+      "name": "Brown Rice",
+      "category": "Sides",
+      "price": 95
+    },
+    {
+      "id": 18,
+      "name": "Curry Sauce",
+      "category": "Sides",
+      "price": 120
+    },
+    {
+      "id": 19,
+      "name": "Miso Soup",
+      "category": "Sides",
+      "price": 80
+    },
+    {
+      "id": 20,
+      "name": "Fried Egg",
+      "category": "Sides",
+      "price": 65
+    },
+    {
+      "id": 21,
+      "name": "Organic Cabbage",
+      "category": "Sides",
+      "price": 80
+    },
+    {
+      "id": 22,
+      "name": "Potato and Egg Salad",
+      "category": "Sides",
+      "price": 277
+    },
+    {
+      "id": 23,
+      "name": "Wakame Salad",
+      "category": "Sides",
+      "price": 277
+    },
+    {
+      "id": 24,
+      "name": "Furikake Fries",
+      "category": "Sides",
+      "price": 277
+    },
+    {
+      "id": 25,
+      "name": "Agedashi Tofu",
+      "category": "Sides",
+      "price": 289
+    },
+    {
+      "id": 26,
+      "name": "Mozzarella Katsu Sticks",
+      "category": "Sides",
+      "price": 362
+    },
+    {
+      "id": 27,
+      "name": "Korokke Tamago",
+      "category": "Sides",
+      "price": 283
+    },
+    {
+      "id": 28,
+      "name": "Chicken Salad",
+      "category": "Sides",
+      "price": 374
+    },
+    {
+      "id": 29,
+      "name": "Houseblend Iced Tea",
+      "category": "Drinks",
+      "price": 155
+    },
+    {
+      "id": 30,
+      "name": "Mango Shake",
+      "category": "Drinks",
+      "price": 180
+    },
+    {
+      "id": 31,
+      "name": "Watermelon Shake",
+      "category": "Drinks",
+      "price": 155
+    },
+    {
+      "id": 32,
+      "name": "Lemonade",
+      "category": "Drinks",
+      "price": 130
+    },
+    {
+      "id": 33,
+      "name": "Bottled Water",
+      "category": "Drinks",
+      "price": 75
+    },
+    {
+      "id": 34,
+      "name": "Soft Drink",
+      "category": "Drinks",
+      "price": 95
+    },
+    {
+      "id": 35,
+      "name": "Vanilla Lava Cake",
+      "category": "Desserts",
+      "price": 230
+    },
+    {
+      "id": 36,
+      "name": "Vanilla Ice Cream",
+      "category": "Desserts",
+      "price": 75
+    },
+    {
+      "id": 37,
+      "name": "Chocolate Ice Cream",
+      "category": "Desserts",
+      "price": 85
+    },
+    {
+      "id": 38,
+      "name": "Japanese Cheesecake",
+      "category": "Desserts",
+      "price": 195
+    },
+    {
+      "id": 39,
+      "name": "Chocolate Cake",
+      "category": "Desserts",
+      "price": 210
+    },
+    {
+      "id": 40,
+      "name": "Mango Dessert",
+      "category": "Desserts",
+      "price": 180
+    }
+  ],
+  "tables": [
+    {
+      "id": 1,
+      "status": "Available"
+    },
+    {
+      "id": 2,
+      "status": "Available"
+    },
+    {
+      "id": 3,
+      "status": "Available"
+    },
+    {
+      "id": 4,
+      "status": "Available"
+    },
+    {
+      "id": 5,
+      "status": "Available"
+    },
+    {
+      "id": 6,
+      "status": "Occupied"
+    },
+    {
+      "id": 7,
+      "status": "Available"
+    },
+    {
+      "id": 8,
+      "status": "Available"
+    },
+    {
+      "id": 9,
+      "status": "Available"
+    },
+    {
+      "id": 10,
+      "status": "Available"
+    },
+    {
+      "id": 11,
+      "status": "Available"
+    },
+    {
+      "id": 12,
+      "status": "Available"
+    },
+    {
+      "id": 13,
+      "status": "Available"
+    },
+    {
+      "id": 14,
+      "status": "Available"
+    },
+    {
+      "id": 15,
+      "status": "Available"
+    }
+  ],
+  "orders": [
+    {
+      "id": 1792322327711,
+      "customer": "arishelle mikaela, fernandez",
+      "type": "Dine-In",
+      "tableId": 6,
+      "address": "",
+      "phone": "",
+      "items": [
+        {
+          "itemId": 2,
+          "itemName": "Chicken Katsu Set",
+          "unitPrice": 375,
+          "quantity": 1,
+          "subtotal": 375
+        },
+        {
+          "itemId": 9,
+          "itemName": "Cream Dory Katsu",
+          "unitPrice": 465,
+          "quantity": 1,
+          "subtotal": 465
+        }
+      ],
+      "total": 840,
+      "status": "Pending",
+      "date": "2026-10-18T11:18:47.711Z"
+    }
+  ],
+  "inventory": [
+    {
+      "id": 1,
+      "name": "Pork Loin",
+      "quantity": 30,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 2,
+      "name": "Pork Tenderloin",
+      "quantity": 25,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 3,
+      "name": "Chicken Breast",
+      "quantity": 35,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 4,
+      "name": "Ground Pork and Beef",
+      "quantity": 15,
+      "unit": "kg",
+      "minimum": 3
+    },
+    {
+      "id": 5,
+      "name": "Cream Dory Fish",
+      "quantity": 20,
+      "unit": "kg",
+      "minimum": 4
+    },
+    {
+      "id": 6,
+      "name": "Salmon",
+      "quantity": 12,
+      "unit": "kg",
+      "minimum": 3
+    },
+    {
+      "id": 7,
+      "name": "Prawns",
+      "quantity": 10,
+      "unit": "kg",
+      "minimum": 2
+    },
+    {
+      "id": 8,
+      "name": "Japanese White Rice",
+      "quantity": 80,
+      "unit": "kg",
+      "minimum": 15
+    },
+    {
+      "id": 9,
+      "name": "Brown Rice",
+      "quantity": 25,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 10,
+      "name": "Panko Breadcrumbs",
+      "quantity": 20,
+      "unit": "kg",
+      "minimum": 4
+    },
+    {
+      "id": 11,
+      "name": "All-Purpose Flour",
+      "quantity": 15,
+      "unit": "kg",
+      "minimum": 3
+    },
+    {
+      "id": 12,
+      "name": "Eggs",
+      "quantity": 300,
+      "unit": "pieces",
+      "minimum": 50
+    },
+    {
+      "id": 13,
+      "name": "Cooking Oil",
+      "quantity": 40,
+      "unit": "liters",
+      "minimum": 10
+    },
+    {
+      "id": 14,
+      "name": "Cabbage",
+      "quantity": 30,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 15,
+      "name": "Potatoes",
+      "quantity": 25,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 16,
+      "name": "Onions",
+      "quantity": 15,
+      "unit": "kg",
+      "minimum": 3
+    },
+    {
+      "id": 17,
+      "name": "Carrots",
+      "quantity": 12,
+      "unit": "kg",
+      "minimum": 3
+    },
+    {
+      "id": 18,
+      "name": "Tofu",
+      "quantity": 40,
+      "unit": "pieces",
+      "minimum": 8
+    },
+    {
+      "id": 19,
+      "name": "Edamame",
+      "quantity": 10,
+      "unit": "kg",
+      "minimum": 2
+    },
+    {
+      "id": 20,
+      "name": "Wakame Seaweed",
+      "quantity": 5,
+      "unit": "kg",
+      "minimum": 1
+    },
+    {
+      "id": 21,
+      "name": "Curry Sauce",
+      "quantity": 15,
+      "unit": "liters",
+      "minimum": 3
+    },
+    {
+      "id": 22,
+      "name": "Soy Sauce",
+      "quantity": 12,
+      "unit": "liters",
+      "minimum": 3
+    },
+    {
+      "id": 23,
+      "name": "Miso Paste",
+      "quantity": 8,
+      "unit": "kg",
+      "minimum": 2
+    },
+    {
+      "id": 24,
+      "name": "Mayonnaise",
+      "quantity": 10,
+      "unit": "liters",
+      "minimum": 2
+    },
+    {
+      "id": 25,
+      "name": "Cheese",
+      "quantity": 10,
+      "unit": "kg",
+      "minimum": 2
+    },
+    {
+      "id": 26,
+      "name": "Ice Cream",
+      "quantity": 20,
+      "unit": "packs",
+      "minimum": 4
+    },
+    {
+      "id": 27,
+      "name": "Mangoes",
+      "quantity": 25,
+      "unit": "kg",
+      "minimum": 5
+    },
+    {
+      "id": 28,
+      "name": "Watermelon",
+      "quantity": 20,
+      "unit": "kg",
+      "minimum": 4
+    },
+    {
+      "id": 29,
+      "name": "Tea Leaves",
+      "quantity": 8,
+      "unit": "kg",
+      "minimum": 2
+    },
+    {
+      "id": 30,
+      "name": "Sugar",
+      "quantity": 15,
+      "unit": "kg",
+      "minimum": 3
+    },
+    {
+      "id": 31,
+      "name": "Milk",
+      "quantity": 30,
+      "unit": "liters",
+      "minimum": 5
+    },
+    {
+      "id": 32,
+      "name": "Chocolate Syrup",
+      "quantity": 8,
+      "unit": "liters",
+      "minimum": 2
+    },
+    {
+      "id": 33,
+      "name": "Take-Out Containers",
+      "quantity": 200,
+      "unit": "pieces",
+      "minimum": 40
+    },
+    {
+      "id": 34,
+      "name": "Delivery Bags",
+      "quantity": 100,
+      "unit": "pieces",
+      "minimum": 20
+    },
+    {
+      "id": 35,
+      "name": "Paper Napkins",
+      "quantity": 500,
+      "unit": "pieces",
+      "minimum": 100
+    },
+    {
+      "id": 36,
+      "name": "Disposable Cutlery",
+      "quantity": 300,
+      "unit": "pieces",
+      "minimum": 50
+    }
+  ],
+  "employees": [
+    {
+      "id": 1,
+      "name": "Juan Dela Cruz",
+      "position": "Manager"
+    },
+    {
+      "id": 2,
+      "name": "Maria Santos",
+      "position": "Cashier"
+    },
+    {
+      "id": 3,
+      "name": "Pedro Reyes",
+      "position": "Chef"
+    },
+    {
+      "id": 4,
+      "name": "Ana Garcia",
+      "position": "Waiter"
+    },
+    {
+      "id": 5,
+      "name": "Mark Ramos",
+      "position": "Kitchen Staff"
+    }
+  ]
+}

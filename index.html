@@ -1,1444 +1,651 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YABU Restaurant Management System</title>
-    <style>
-        /* Clean menu layout */
-        #menuList { display: flex; flex-direction: column; gap: 24px; margin-top: 18px; }
-        .menu-category-section { border: 1px solid #e6e1dc; border-radius: 12px; padding: 16px; background: #fffdfb; }
-        .menu-category-title { margin: 0 0 14px; padding: 0 0 10px; border-bottom: 2px solid #8b1e24; color: #8b1e24; font-size: 1.15rem; }
-        .menu-items-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-        .menu-item-card { border: 1px solid #e8e3df; border-radius: 10px; padding: 14px; background: #fff; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-        .menu-item-card h4 { margin: 0; overflow-wrap: anywhere; }
-        .menu-item-category { align-self: flex-start; margin: 0; padding: 4px 9px; border-radius: 999px; background: #f4e8e7; color: #7d2025; font-size: .78rem; }
-        .menu-item-price { margin: 0; font-weight: 700; font-size: 1.05rem; }
-        .menu-item-card button { align-self: flex-start; margin-top: auto; }
-        #orderMenu { width: min(100%, 520px); min-height: 230px; padding: 8px; }
-        #multiSelectHelp { display: block; max-width: 620px; margin-top: 6px; color: #625d59; }
-        @media (max-width: 600px) { .menu-category-section { padding: 12px; } .menu-items-grid { grid-template-columns: 1fr; } }
-    </style>
 </head>
 <body>
 
-<header>
-    <h1>YABU Restaurant Management System</h1>
-    <p>Restaurant Operations and Management</p>
-</header>
+    <header>
+        <h1>YABU</h1>
+        <p>THE HOUSE OF KATSU</p>
+        <p>Restaurant Management System</p>
+    </header>
 
-<nav>
-    <button type="button" onclick="showSection('dashboard')">Dashboard</button>
-    <button type="button" onclick="showSection('tables')">Tables</button>
-    <button type="button" onclick="showSection('orders')">Orders</button>
-    <button type="button" onclick="showSection('menu')">Menu</button>
-    <button type="button" onclick="showSection('inventory')">Inventory</button>
-    <button type="button" onclick="showSection('reports')">Reports</button>
-    <button type="button" onclick="showSection('employees')">Employees</button>
-    <button type="button" onclick="showSection('settings')">Settings</button>
-</nav>
+    <nav id="nav">
+        <button data-page="dashboard">Dashboard</button>
+        <button data-page="tables">Tables</button>
+        <button data-page="orders">Orders</button>
+        <button data-page="menu">Menu</button>
+        <button data-page="inventory">Inventory</button>
+        <button data-page="reports">Reports</button>
+        <button data-page="employees">Employees</button>
+        <button data-page="settings">Settings</button>
+    </nav>
 
-<main>
+    <main>
+        <input id="search" placeholder="Search orders, menu, inventory">
 
-    <!-- DASHBOARD -->
-    <section id="dashboard">
-        <h2>Dashboard</h2>
-        <p>Total Menu Items: <span id="totalMenu">0</span></p>
-        <p>Total Orders: <span id="totalOrders">0</span></p>
-        <p>Pending Orders: <span id="pendingOrders">0</span></p>
-        <p>Preparing Orders: <span id="preparingOrders">0</span></p>
-        <p>Completed Orders: <span id="completedOrdersDashboard">0</span></p>
-        <p>Available Tables: <span id="availableTables">0</span></p>
-        <p>Occupied Tables: <span id="occupiedTables">0</span></p>
-        <p>Low-Stock Ingredients: <span id="lowStock">0</span></p>
-        <p>Total Employees: <span id="totalEmployees">0</span></p>
-        <p>Completed Sales: ₱<span id="totalSales">0.00</span></p>
-    </section>
+        <section id="dashboard" class="page">
+            <h2>Dashboard</h2>
+            <p>Welcome back! Here's what's happening today.</p>
 
-    <!-- TABLE MANAGEMENT -->
-    <section id="tables" hidden>
-        <h2>Table Management</h2>
-        <p>Total Tables: 15</p>
-        <div id="tableList"></div>
-    </section>
+            <button onclick="show('orders')">New Order</button>
 
-    <!-- ORDER MANAGEMENT -->
-    <section id="orders" hidden>
-        <h2>Order Management</h2>
+            <h3>Sales Overview</h3>
+            <div id="sales"></div>
 
-        <form id="orderForm">
-            <label for="orderCustomer">Customer Name:</label>
-            <input type="text" id="orderCustomer" required>
-            <br><br>
+            <h3>Recent Orders</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Table</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recent"></tbody>
+            </table>
+        </section>
 
-            <label for="orderType">Order Type:</label>
-            <select id="orderType" required>
-                <option value="Dine-In">Dine-In</option>
-                <option value="Take-Out">Take-Out</option>
-                <option value="Delivery">Delivery</option>
-            </select>
-            <br><br>
+        <section id="tables" class="page" hidden>
+            <h2>Table Management</h2>
+            <p>Manage table availability and occupancy.</p>
 
-            <div id="orderTableGroup">
+            <div id="tableStats"></div>
+            <div id="tableGrid"></div>
+        </section>
+
+        <section id="orders" class="page" hidden>
+            <h2>Order Management</h2>
+            <p>Track and manage customer orders.</p>
+
+            <button onclick="addOrder()">Add Order</button>
+
+            <form id="orderForm">
+                <h3>New Customer Order</h3>
+
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" required>
+
+                <br><br>
+
                 <label for="orderTable">Select Table:</label>
                 <select id="orderTable" required></select>
-                <br><br>
-            </div>
 
-            <div id="deliveryAddressGroup" hidden>
-                <label for="deliveryAddress">Delivery Address:</label>
-                <textarea id="deliveryAddress" rows="3"></textarea>
                 <br><br>
 
-                <label for="deliveryPhone">Contact Number:</label>
-                <input type="tel" id="deliveryPhone">
+                <label for="orderMenu">Select Menu Item:</label>
+                <select id="orderMenu" required></select>
+
                 <br><br>
-            </div>
 
-            <h3>Select Menu Items</h3>
+                <label for="orderQuantity">Quantity:</label>
+                <input type="number" id="orderQuantity" min="1" value="1" required>
 
-            <label for="orderCategory">Category:</label>
-            <select id="orderCategory">
-                <option value="All">All Categories</option>
-                <option value="Best Seller">Best Seller</option>
-                <option value="Katsu">Katsu</option>
-                <option value="Sides">Sides</option>
-                <option value="Drinks">Drinks</option>
-                <option value="Desserts">Desserts</option>
-            </select>
-            <br><br>
+                <br><br>
 
-            <label for="orderMenu">Menu Items (select multiple):</label>
-            <select id="orderMenu" multiple size="10" aria-describedby="multiSelectHelp"></select>
-            <small id="multiSelectHelp">Select multiple dishes by holding Ctrl (Windows) or Command (Mac) while clicking. You can also add items one at a time using the button below; they will stay in the same order.</small>
-            <br><br>
+                <button type="submit">Place Order</button>
+            </form>
 
-            <label for="orderQuantity">Quantity:</label>
-            <input type="number" id="orderQuantity" min="1" step="1" value="1" required>
-            <br><br>
+            <h3>Customer Orders</h3>
 
-            <button type="button" id="addToCartButton">Add Selected Items to Order</button>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Table</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="orderRows"></tbody>
+            </table>
+        </section>
 
-            <h3>Current Order</h3>
-            <p>You can add multiple different items to one order.</p>
+        <section id="menu" class="page" hidden>
+            <h2>Menu</h2>
+            <div id="menuGrid"></div>
+        </section>
 
-            <div id="cartList"></div>
+        <section id="inventory" class="page" hidden>
+            <h2>Inventory</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="stockRows"></tbody>
+            </table>
+        </section>
 
-            <p><strong>Total Items:</strong> <span id="cartItemCount">0</span></p>
-            <p><strong>Grand Total:</strong> ₱<span id="cartTotal">0.00</span></p>
+        <section id="reports" class="page" hidden>
+            <h2>Reports</h2>
+            <p>Weekly Sales Summary</p>
+            <div id="reportStats"></div>
+            <div id="reportBars"></div>
+            <button onclick="window.print()">Print Report</button>
+        </section>
 
-            <button type="submit">Place Complete Order</button>
-            <button type="button" id="clearCartButton">Clear All Items</button>
-        </form>
+        <section id="employees" class="page" hidden>
+            <h2>Employees</h2>
+            <div id="employeeRows"></div>
+        </section>
 
-        <hr>
+        <section id="settings" class="page" hidden>
+            <h2>Settings</h2>
+            <p>Restaurant Name: YABU</p>
+            <p>Currency: Philippine Peso (PHP)</p>
+            <p>Order Management: Enabled</p>
+            <p>Table Management: Enabled</p>
+            <button onclick="alert('Settings saved for this demo session.')">
+                Save Settings
+            </button>
+        </section>
+    </main>
 
-        <h3>Order List</h3>
-        <label for="orderSearch">Search Orders:</label>
-        <input type="text" id="orderSearch" placeholder="Search customer or order ID">
+    <!-- JSON DATA -->
+    <script type="application/json" id="yabuJSON">
+    {
+        "menu": [
+            {
+                "id": 1,
+                "name": "Rosu Pork Loin Set",
+                "category": "Katsu Set",
+                "price": 450,
+                "icon": "🍱"
+            },
+            {
+                "id": 2,
+                "name": "Chicken Katsu Set",
+                "category": "Katsu Set",
+                "price": 425,
+                "icon": "🍗"
+            },
+            {
+                "id": 3,
+                "name": "Cream Dory Katsu",
+                "category": "Seafood",
+                "price": 435,
+                "icon": "🐟"
+            },
+            {
+                "id": 4,
+                "name": "Prawn Katsu Set",
+                "category": "Seafood",
+                "price": 640,
+                "icon": "🍤"
+            },
+            {
+                "id": 5,
+                "name": "Rosu Katsu Curry",
+                "category": "Curry",
+                "price": 510,
+                "icon": "🍛"
+            }
+        ],
+        "orders": [
+            {
+                "id": "ORD-00379",
+                "customer": "Maria Santos",
+                "table": 3,
+                "items": 2,
+                "total": 950,
+                "status": "Preparing",
+                "details": [
+                    {"name": "Rosu Pork Loin Set", "quantity": 1, "price": 450},
+                    {"name": "Chicken Katsu Set", "quantity": 1, "price": 425}
+                ]
+            },
+            {
+                "id": "ORD-00378",
+                "customer": "Juan Dela Cruz",
+                "table": 5,
+                "items": 3,
+                "total": 1280,
+                "status": "Served",
+                "details": []
+            },
+            {
+                "id": "ORD-00377",
+                "customer": "Angela Reyes",
+                "table": 1,
+                "items": 1,
+                "total": 450,
+                "status": "Pending",
+                "details": [
+                    {"name": "Rosu Pork Loin Set", "quantity": 1, "price": 450}
+                ]
+            }
+        ],
+        "tables": [
+            {"number": 1, "status": "Occupied"},
+            {"number": 2, "status": "Available"},
+            {"number": 3, "status": "Occupied"},
+            {"number": 4, "status": "Available"},
+            {"number": 5, "status": "Reserved"},
+            {"number": 6, "status": "Available"},
+            {"number": 7, "status": "Occupied"},
+            {"number": 8, "status": "Available"},
+            {"number": 9, "status": "Available"},
+            {"number": 10, "status": "Available"},
+            {"number": 11, "status": "Available"},
+            {"number": 12, "status": "Available"},
+            {"number": 13, "status": "Available"},
+            {"number": 14, "status": "Available"},
+            {"number": 15, "status": "Available"}
+        ],
+        "inventory": [
+            {
+                "name": "Pork Loin",
+                "category": "Meat",
+                "quantity": 24,
+                "status": "In Stock"
+            },
+            {
+                "name": "Chicken",
+                "category": "Meat",
+                "quantity": 18,
+                "status": "In Stock"
+            },
+            {
+                "name": "Rice",
+                "category": "Dry Goods",
+                "quantity": 9,
+                "status": "Low Stock"
+            }
+        ],
+        "employees": [
+            {
+                "name": "Alex Rivera",
+                "role": "Manager",
+                "status": "Active"
+            },
+            {
+                "name": "Jamie Cruz",
+                "role": "Cashier",
+                "status": "Active"
+            }
+        ],
+        "sales": [
+            {"day": "Mon", "amount": 4200},
+            {"day": "Tue", "amount": 6100},
+            {"day": "Wed", "amount": 5200},
+            {"day": "Thu", "amount": 7800},
+            {"day": "Fri", "amount": 9600},
+            {"day": "Sat", "amount": 8200},
+            {"day": "Sun", "amount": 11200}
+        ]
+    }
+    </script>
 
-        <div id="orderList"></div>
-    </section>
+    <script>
+    // Read the JSON data
+    const data = JSON.parse(
+        document.getElementById("yabuJSON").textContent
+    );
 
-    <!-- MENU MANAGEMENT -->
-    <section id="menu" hidden>
-        <h2>Menu Management</h2>
+    const money = amount =>
+        "₱" + Number(amount).toLocaleString("en-PH", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
 
-        <form id="menuForm">
-            <label for="menuName">Item Name:</label>
-            <input type="text" id="menuName" required>
-            <br><br>
+    let nextOrderNumber = 380;
 
-            <label for="menuCategory">Category:</label>
-            <input type="text" id="menuCategory" list="menuCategorySuggestions" placeholder="Enter or choose a category" required>
-            <datalist id="menuCategorySuggestions">
-                <option value="Best Seller"></option>
-                <option value="Katsu"></option>
-                <option value="Sides"></option>
-                <option value="Drinks"></option>
-                <option value="Desserts"></option>
-            </datalist>
-            <br><br>
+    // Switch pages
+    function show(pageId) {
+        document.querySelectorAll(".page").forEach(page => {
+            page.hidden = page.id !== pageId;
+        });
 
-            <label for="menuPrice">Price (₱):</label>
-            <input type="number" id="menuPrice" min="0.01" step="0.01" required>
-            <br><br>
+        if (pageId === "tables") renderTables();
+        if (pageId === "orders") {
+            renderOrders();
+            renderOrderTableOptions();
+        }
+    }
 
-            <button type="submit">Add Menu Item</button>
-        </form>
+    document.getElementById("nav").addEventListener("click", event => {
+        const button = event.target.closest("button[data-page]");
 
-        <h3>Menu Items</h3>
-        <label for="menuSearch">Search Menu:</label>
-        <input type="text" id="menuSearch" placeholder="Search item or category">
-
-        <div id="menuList"></div>
-    </section>
-
-    <!-- INVENTORY MANAGEMENT -->
-    <section id="inventory" hidden>
-        <h2>Inventory Management</h2>
-
-        <form id="inventoryForm">
-            <label for="ingredientName">Ingredient Name:</label>
-            <input type="text" id="ingredientName" required>
-            <br><br>
-
-            <label for="ingredientQuantity">Quantity:</label>
-            <input type="number" id="ingredientQuantity" min="0" step="0.01" required>
-            <br><br>
-
-            <label for="ingredientUnit">Unit:</label>
-            <select id="ingredientUnit" required>
-                <option value="kg">Kilograms</option>
-                <option value="grams">Grams</option>
-                <option value="liters">Liters</option>
-                <option value="pieces">Pieces</option>
-                <option value="packs">Packs</option>
-                <option value="bottles">Bottles</option>
-                <option value="boxes">Boxes</option>
-            </select>
-            <br><br>
-
-            <label for="ingredientMinimum">Minimum Stock:</label>
-            <input type="number" id="ingredientMinimum" min="0" value="5" required>
-            <br><br>
-
-            <button type="submit">Add Ingredient</button>
-        </form>
-
-        <h3>Inventory List</h3>
-        <div id="inventoryList"></div>
-    </section>
-
-    <!-- SALES REPORTS -->
-    <section id="reports" hidden>
-        <h2>Sales Reports</h2>
-
-        <p>Total Orders: <span id="reportOrders">0</span></p>
-        <p>Completed Orders: <span id="reportCompleted">0</span></p>
-        <p>Dine-In Orders: <span id="reportDineIn">0</span></p>
-        <p>Take-Out Orders: <span id="reportTakeOut">0</span></p>
-        <p>Delivery Orders: <span id="reportDelivery">0</span></p>
-        <p>Completed Revenue: ₱<span id="reportRevenue">0.00</span></p>
-
-        <h3>Data Backup</h3>
-        <button type="button" id="exportButton">Export JSON Data</button>
-        <button type="button" id="importButton">Import JSON Data</button>
-        <input type="file" id="importFile" accept=".json,application/json" hidden>
-    </section>
-
-    <!-- EMPLOYEE MANAGEMENT -->
-    <section id="employees" hidden>
-        <h2>Employee Management</h2>
-
-        <form id="employeeForm">
-            <label for="employeeName">Employee Name:</label>
-            <input type="text" id="employeeName" required>
-            <br><br>
-
-            <label for="employeePosition">Position:</label>
-            <select id="employeePosition" required>
-                <option value="Manager">Manager</option>
-                <option value="Cashier">Cashier</option>
-                <option value="Chef">Chef</option>
-                <option value="Kitchen Staff">Kitchen Staff</option>
-                <option value="Waiter">Waiter</option>
-                <option value="Delivery Staff">Delivery Staff</option>
-            </select>
-            <br><br>
-
-            <button type="submit">Add Employee</button>
-        </form>
-
-        <h3>Employee List</h3>
-        <div id="employeeList"></div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="settings" hidden>
-        <h2>System Settings</h2>
-        <p>Restaurant Name: <span id="restaurantName"></span></p>
-        <p>Currency: Philippine Peso (PHP)</p>
-        <p>Number of Tables: 15</p>
-
-        <button type="button" id="backupButton">Backup System Data</button>
-        <button type="button" id="resetButton">Reset System Data</button>
-    </section>
-
-</main>
-
-<script>
-"use strict";
-
-// ========================================
-// INITIAL SYSTEM DATA
-// ========================================
-
-const initialData = {
-    settings: {
-        restaurantName: "YABU: House of Katsu",
-        currency: "PHP"
-    },
-
-    menu: [
-        { id: 1, name: "Rosu Katsu Set", category: "Best Seller", price: 390 },
-        { id: 2, name: "Chicken Katsu Set", category: "Best Seller", price: 375 },
-        { id: 3, name: "Rosu Katsu Curry", category: "Best Seller", price: 475 },
-        { id: 4, name: "Chicken Katsu Curry", category: "Katsu", price: 450 },
-        { id: 5, name: "Hire Katsu Set", category: "Katsu", price: 415 },
-        { id: 6, name: "Pork Katsu Set", category: "Katsu", price: 430 },
-        { id: 7, name: "Menchi Katsu Set", category: "Katsu", price: 475 },
-        { id: 8, name: "Ebi Fry Set", category: "Katsu", price: 490 },
-        { id: 9, name: "Cream Dory Katsu", category: "Katsu", price: 465 },
-        { id: 10, name: "Rosu Katsudon", category: "Katsu", price: 475 },
-        { id: 11, name: "Chicken Katsudon", category: "Katsu", price: 455 },
-        { id: 12, name: "Hire Katsu Curry", category: "Katsu", price: 495 },
-        { id: 13, name: "Deluxe Mixed Katsu", category: "Katsu", price: 715 },
-        { id: 14, name: "Salmon Katsu Set", category: "Katsu", price: 655 },
-        { id: 15, name: "Prawn Katsu Set", category: "Katsu", price: 610 },
-
-        { id: 16, name: "White Japanese Rice", category: "Sides", price: 95 },
-        { id: 17, name: "Brown Rice", category: "Sides", price: 95 },
-        { id: 18, name: "Curry Sauce", category: "Sides", price: 120 },
-        { id: 19, name: "Miso Soup", category: "Sides", price: 80 },
-        { id: 20, name: "Fried Egg", category: "Sides", price: 65 },
-        { id: 21, name: "Organic Cabbage", category: "Sides", price: 80 },
-        { id: 22, name: "Potato and Egg Salad", category: "Sides", price: 277 },
-        { id: 23, name: "Wakame Salad", category: "Sides", price: 277 },
-        { id: 24, name: "Furikake Fries", category: "Sides", price: 277 },
-        { id: 25, name: "Agedashi Tofu", category: "Sides", price: 289 },
-        { id: 26, name: "Mozzarella Katsu Sticks", category: "Sides", price: 362 },
-        { id: 27, name: "Korokke Tamago", category: "Sides", price: 283 },
-        { id: 28, name: "Chicken Salad", category: "Sides", price: 374 },
-
-        { id: 29, name: "Houseblend Iced Tea", category: "Drinks", price: 155 },
-        { id: 30, name: "Mango Shake", category: "Drinks", price: 180 },
-        { id: 31, name: "Watermelon Shake", category: "Drinks", price: 155 },
-        { id: 32, name: "Lemonade", category: "Drinks", price: 130 },
-        { id: 33, name: "Bottled Water", category: "Drinks", price: 75 },
-        { id: 34, name: "Soft Drink", category: "Drinks", price: 95 },
-
-        { id: 35, name: "Vanilla Lava Cake", category: "Desserts", price: 230 },
-        { id: 36, name: "Vanilla Ice Cream", category: "Desserts", price: 75 },
-        { id: 37, name: "Chocolate Ice Cream", category: "Desserts", price: 85 },
-        { id: 38, name: "Japanese Cheesecake", category: "Desserts", price: 195 },
-        { id: 39, name: "Chocolate Cake", category: "Desserts", price: 210 },
-        { id: 40, name: "Mango Dessert", category: "Desserts", price: 180 }
-    ],
-
-    tables: Array.from({ length: 15 }, function(_, index) {
-        return {
-            id: index + 1,
-            status: "Available"
-        };
-    }),
-
-    orders: [],
-
-    inventory: [
-        { id: 1, name: "Pork Loin", quantity: 30, unit: "kg", minimum: 5 },
-        { id: 2, name: "Pork Tenderloin", quantity: 25, unit: "kg", minimum: 5 },
-        { id: 3, name: "Chicken Breast", quantity: 35, unit: "kg", minimum: 5 },
-        { id: 4, name: "Ground Pork and Beef", quantity: 15, unit: "kg", minimum: 3 },
-        { id: 5, name: "Cream Dory Fish", quantity: 20, unit: "kg", minimum: 4 },
-        { id: 6, name: "Salmon", quantity: 12, unit: "kg", minimum: 3 },
-        { id: 7, name: "Prawns", quantity: 10, unit: "kg", minimum: 2 },
-        { id: 8, name: "Japanese White Rice", quantity: 80, unit: "kg", minimum: 15 },
-        { id: 9, name: "Brown Rice", quantity: 25, unit: "kg", minimum: 5 },
-        { id: 10, name: "Panko Breadcrumbs", quantity: 20, unit: "kg", minimum: 4 },
-        { id: 11, name: "All-Purpose Flour", quantity: 15, unit: "kg", minimum: 3 },
-        { id: 12, name: "Eggs", quantity: 300, unit: "pieces", minimum: 50 },
-        { id: 13, name: "Cooking Oil", quantity: 40, unit: "liters", minimum: 10 },
-        { id: 14, name: "Cabbage", quantity: 30, unit: "kg", minimum: 5 },
-        { id: 15, name: "Potatoes", quantity: 25, unit: "kg", minimum: 5 },
-        { id: 16, name: "Onions", quantity: 15, unit: "kg", minimum: 3 },
-        { id: 17, name: "Carrots", quantity: 12, unit: "kg", minimum: 3 },
-        { id: 18, name: "Tofu", quantity: 40, unit: "pieces", minimum: 8 },
-        { id: 19, name: "Edamame", quantity: 10, unit: "kg", minimum: 2 },
-        { id: 20, name: "Wakame Seaweed", quantity: 5, unit: "kg", minimum: 1 },
-        { id: 21, name: "Curry Sauce", quantity: 15, unit: "liters", minimum: 3 },
-        { id: 22, name: "Soy Sauce", quantity: 12, unit: "liters", minimum: 3 },
-        { id: 23, name: "Miso Paste", quantity: 8, unit: "kg", minimum: 2 },
-        { id: 24, name: "Mayonnaise", quantity: 10, unit: "liters", minimum: 2 },
-        { id: 25, name: "Cheese", quantity: 10, unit: "kg", minimum: 2 },
-        { id: 26, name: "Ice Cream", quantity: 20, unit: "packs", minimum: 4 },
-        { id: 27, name: "Mangoes", quantity: 25, unit: "kg", minimum: 5 },
-        { id: 28, name: "Watermelon", quantity: 20, unit: "kg", minimum: 4 },
-        { id: 29, name: "Tea Leaves", quantity: 8, unit: "kg", minimum: 2 },
-        { id: 30, name: "Sugar", quantity: 15, unit: "kg", minimum: 3 },
-        { id: 31, name: "Milk", quantity: 30, unit: "liters", minimum: 5 },
-        { id: 32, name: "Chocolate Syrup", quantity: 8, unit: "liters", minimum: 2 },
-        { id: 33, name: "Take-Out Containers", quantity: 200, unit: "pieces", minimum: 40 },
-        { id: 34, name: "Delivery Bags", quantity: 100, unit: "pieces", minimum: 20 },
-        { id: 35, name: "Paper Napkins", quantity: 500, unit: "pieces", minimum: 100 },
-        { id: 36, name: "Disposable Cutlery", quantity: 300, unit: "pieces", minimum: 50 }
-    ],
-
-    employees: [
-        { id: 1, name: "Juan Dela Cruz", position: "Manager" },
-        { id: 2, name: "Maria Santos", position: "Cashier" },
-        { id: 3, name: "Pedro Reyes", position: "Chef" },
-        { id: 4, name: "Ana Garcia", position: "Waiter" },
-        { id: 5, name: "Mark Ramos", position: "Kitchen Staff" }
-    ]
-};
-
-let data = JSON.parse(JSON.stringify(initialData));
-let cart = [];
-
-// ========================================
-// GENERAL FUNCTIONS
-// ========================================
-
-function showSection(sectionId) {
-    document.querySelectorAll("main section").forEach(function(section) {
-        section.hidden = section.id !== sectionId;
+        if (button) {
+            show(button.dataset.page);
+        }
     });
 
-    renderAll();
-}
+    // Render orders
+    function renderOrders() {
+        document.getElementById("orderRows").innerHTML =
+            data.orders.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${escapeHTML(order.customer)}</td>
+                    <td>Table ${order.table}</td>
+                    <td>${order.items}</td>
+                    <td>${money(order.total)}</td>
+                    <td>${order.status}</td>
+                    <td>
+                        ${order.status !== "Served" && order.status !== "Cancelled"
+                            ? `<button onclick="updateOrderStatus('${order.id}', 'Preparing')">Preparing</button>
+                               <button onclick="updateOrderStatus('${order.id}', 'Served')">Served</button>
+                               <button onclick="updateOrderStatus('${order.id}', 'Cancelled')">Cancel</button>`
+                            : order.status}
+                    </td>
+                </tr>
+            `).join("");
 
-function formatCurrency(amount) {
-    return Number(amount).toLocaleString("en-PH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
+        document.getElementById("recent").innerHTML =
+            data.orders.slice(0, 4).map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.table}</td>
+                    <td>${money(order.total)}</td>
+                    <td>${order.status}</td>
+                </tr>
+            `).join("");
+    }
 
-function makeElement(tag, text) {
-    const element = document.createElement(tag);
-    element.textContent = text;
-    return element;
-}
+    function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
 
-// ========================================
-// DASHBOARD
-// ========================================
+    // Display menu
+    function renderMenu() {
+        document.getElementById("menuGrid").innerHTML =
+            data.menu.map(item => `
+                <div>
+                    <h3>${item.icon} ${escapeHTML(item.name)}</h3>
+                    <p>Category: ${escapeHTML(item.category)}</p>
+                    <p>Price: ${money(item.price)}</p>
+                </div>
+            `).join("");
+    }
 
-function renderDashboard() {
-    document.getElementById("totalMenu").textContent = data.menu.length;
-    document.getElementById("totalOrders").textContent = data.orders.length;
+    // Display table information and counts
+    function renderTables() {
+        const statuses = ["Available", "Occupied", "Reserved", "Cleaning"];
 
-    document.getElementById("pendingOrders").textContent =
-        data.orders.filter(order => order.status === "Pending").length;
+        const counts = Object.fromEntries(
+            statuses.map(status => [
+                status,
+                data.tables.filter(table => table.status === status).length
+            ])
+        );
 
-    document.getElementById("preparingOrders").textContent =
-        data.orders.filter(order => order.status === "Preparing").length;
+        document.getElementById("tableStats").innerHTML = `
+            <p>Total Tables: ${data.tables.length}</p>
+            <p>Available: ${counts.Available}</p>
+            <p>Occupied: ${counts.Occupied}</p>
+            <p>Reserved: ${counts.Reserved}</p>
+            <p>Cleaning: ${counts.Cleaning}</p>
+            <label for="tableStatusFilter">Filter Tables:</label>
+            <select id="tableStatusFilter" onchange="renderTableGrid()">
+                <option value="All">All Statuses</option>
+                ${statuses.map(status =>
+                    `<option value="${status}">${status}</option>`
+                ).join("")}
+            </select>
+        `;
 
-    document.getElementById("completedOrdersDashboard").textContent =
-        data.orders.filter(order => order.status === "Completed").length;
+        renderTableGrid();
+        renderOrderTableOptions();
+    }
 
-    document.getElementById("availableTables").textContent =
-        data.tables.filter(table => table.status === "Available").length;
+    function renderTableGrid() {
+        const filter = document.getElementById("tableStatusFilter")?.value || "All";
 
-    document.getElementById("occupiedTables").textContent =
-        data.tables.filter(table => table.status === "Occupied").length;
+        document.getElementById("tableGrid").innerHTML =
+            data.tables
+                .filter(table => filter === "All" || table.status === filter)
+                .map(table => `
+                    <div>
+                        <h3>Table ${table.number}</h3>
+                        <p>Current Status: ${table.status}</p>
+                        <label for="table-${table.number}">Change Status:</label>
+                        <select id="table-${table.number}"
+                                onchange="changeTableStatus(${table.number}, this.value)">
+                            ${["Available", "Occupied", "Reserved", "Cleaning"]
+                                .map(status => `
+                                    <option value="${status}"
+                                        ${table.status === status ? "selected" : ""}>
+                                        ${status}
+                                    </option>
+                                `).join("")}
+                        </select>
+                    </div>
+                    <hr>
+                `).join("");
+    }
 
-    document.getElementById("lowStock").textContent =
-        data.inventory.filter(item => item.quantity <= item.minimum).length;
-
-    document.getElementById("totalEmployees").textContent = data.employees.length;
-
-    const sales = data.orders
-        .filter(order => order.status === "Completed")
-        .reduce((sum, order) => sum + Number(order.total || 0), 0);
-
-    document.getElementById("totalSales").textContent = formatCurrency(sales);
-}
-
-// ========================================
-// TABLE MANAGEMENT
-// ========================================
-
-function renderTables() {
-    const container = document.getElementById("tableList");
-    container.replaceChildren();
-
-    data.tables.forEach(function(table) {
-        const block = document.createElement("div");
-
-        block.appendChild(makeElement("h3", "Table " + table.id));
-        block.appendChild(makeElement("p", "Status: " + table.status));
+    function changeTableStatus(number, newStatus) {
+        const table = data.tables.find(item => item.number === number);
+        if (!table) return;
 
         const hasActiveOrder = data.orders.some(order =>
-            order.type === "Dine-In" &&
-            order.tableId === table.id &&
-            order.status !== "Completed" &&
-            order.status !== "Cancelled"
+            order.table === number &&
+            !["Served", "Cancelled"].includes(order.status)
         );
 
-        const button = makeElement(
-            "button",
-            table.status === "Available" ? "Mark Occupied" : "Mark Available"
-        );
+        if (hasActiveOrder && ["Available", "Reserved", "Cleaning"].includes(newStatus)) {
+            alert("This table has an active order. Mark the order as Served or Cancelled first.");
+            renderTables();
+            return;
+        }
 
-        button.type = "button";
-
-        button.onclick = function() {
-            if (table.status === "Occupied" && hasActiveOrder) {
-                alert("This table has an active order. Complete or cancel the order first.");
-                return;
-            }
-
-            table.status = table.status === "Available" ? "Occupied" : "Available";
-            renderAll();
-        };
-
-        block.appendChild(button);
-        container.appendChild(block);
-    });
-}
-
-// ========================================
-// ORDER TYPE AND MENU OPTIONS
-// ========================================
-
-function updateOrderTypeFields() {
-    const type = document.getElementById("orderType").value;
-
-    const tableGroup = document.getElementById("orderTableGroup");
-    const addressGroup = document.getElementById("deliveryAddressGroup");
-    const tableSelect = document.getElementById("orderTable");
-    const address = document.getElementById("deliveryAddress");
-    const phone = document.getElementById("deliveryPhone");
-
-    tableGroup.hidden = type !== "Dine-In";
-    addressGroup.hidden = type !== "Delivery";
-
-    tableSelect.required = type === "Dine-In";
-    address.required = type === "Delivery";
-    phone.required = type === "Delivery";
-}
-
-function renderOrderOptions() {
-    const tableSelect = document.getElementById("orderTable");
-    const menuSelect = document.getElementById("orderMenu");
-    const categorySelect = document.getElementById("orderCategory");
-    const category = categorySelect.value;
-
-    tableSelect.replaceChildren();
-    menuSelect.replaceChildren();
-
-    // Keep category filters synced with all categories currently used by menu items.
-    const previousCategory = category;
-    const allCategories = [...new Set(data.menu.map(item => item.category).filter(Boolean))];
-    categorySelect.replaceChildren();
-    const allOption = document.createElement("option");
-    allOption.value = "All";
-    allOption.textContent = "All Categories";
-    categorySelect.appendChild(allOption);
-    allCategories.forEach(function(categoryName) {
-        const option = document.createElement("option");
-        option.value = categoryName;
-        option.textContent = categoryName;
-        categorySelect.appendChild(option);
-    });
-    categorySelect.value = allCategories.includes(previousCategory) || previousCategory === "All"
-        ? previousCategory
-        : "All";
-    const activeCategory = categorySelect.value;
-
-    const availableTables = data.tables.filter(
-        table => table.status === "Available"
-    );
-
-    if (availableTables.length === 0) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "No tables available";
-        tableSelect.appendChild(option);
-    } else {
-        availableTables.forEach(function(table) {
-            const option = document.createElement("option");
-            option.value = table.id;
-            option.textContent = "Table " + table.id;
-            tableSelect.appendChild(option);
-        });
+        table.status = newStatus;
+        renderTables();
     }
 
-    const filteredMenu = data.menu.filter(function(item) {
-        return activeCategory === "All" || item.category === activeCategory;
-    });
+    // Fill the table dropdown with available tables
+    function renderOrderTableOptions() {
+        const select = document.getElementById("orderTable");
+        if (!select) return;
 
-    // Group menu choices by category so the multi-select is easier to scan.
-    const menuGroups = new Map();
-    filteredMenu.forEach(function(item) {
-        const categoryName = item.category || "Uncategorized";
-        if (!menuGroups.has(categoryName)) menuGroups.set(categoryName, []);
-        menuGroups.get(categoryName).push(item);
-    });
+        const previousValue = select.value;
+        select.innerHTML = '<option value="">Select an available table</option>';
 
-    menuGroups.forEach(function(items, categoryName) {
-        const group = document.createElement("optgroup");
-        group.label = categoryName;
-        items.forEach(function(item) {
-            const option = document.createElement("option");
-            option.value = item.id;
-            option.textContent = item.name + " — ₱" + formatCurrency(item.price);
-            group.appendChild(option);
-        });
-        menuSelect.appendChild(group);
-    });
-
-    updateOrderTypeFields();
-}
-
-// ========================================
-// MULTI-ITEM CART
-// ========================================
-
-function addToCart() {
-    const menuSelect = document.getElementById("orderMenu");
-    const selectedMenuIds = Array.from(menuSelect.selectedOptions)
-        .map(option => Number(option.value))
-        .filter(id => Number.isFinite(id));
-    const quantity = Number(document.getElementById("orderQuantity").value);
-
-    if (selectedMenuIds.length === 0) {
-        alert("Please select one or more menu items. Hold Ctrl (Windows) or Command (Mac) to select multiple dishes.");
-        return;
-    }
-
-    if (!Number.isInteger(quantity) || quantity < 1) {
-        alert("Please enter a quantity of at least 1.");
-        return;
-    }
-
-    // Add every selected dish to the same order cart.
-    selectedMenuIds.forEach(function(menuId) {
-        const menuItem = data.menu.find(item => item.id === menuId);
-        if (!menuItem) return;
-
-        const existingItem = cart.find(item => item.itemId === menuItem.id);
-        if (existingItem) {
-            existingItem.quantity += quantity;
-        } else {
-            cart.push({
-                itemId: menuItem.id,
-                name: menuItem.name,
-                category: menuItem.category,
-                price: menuItem.price,
-                quantity: quantity
+        data.tables
+            .filter(table => table.status === "Available")
+            .forEach(table => {
+                const option = document.createElement("option");
+                option.value = table.number;
+                option.textContent = "Table " + table.number;
+                select.appendChild(option);
             });
+
+        if ([...select.options].some(option => option.value === previousValue)) {
+            select.value = previousValue;
         }
-    });
-
-    // Clear the selection but keep the menu options available for the next items.
-    Array.from(menuSelect.options).forEach(option => { option.selected = false; });
-    document.getElementById("orderQuantity").value = 1;
-    renderCart();
-}
-
-function renderCart() {
-    const container = document.getElementById("cartList");
-    container.replaceChildren();
-
-    let grandTotal = 0;
-    let totalItems = 0;
-
-    if (cart.length === 0) {
-        container.appendChild(makeElement("p", "No items added yet."));
     }
 
-    cart.forEach(function(item) {
-        const subtotal = item.price * item.quantity;
-
-        grandTotal += subtotal;
-        totalItems += item.quantity;
-
-        const block = document.createElement("div");
-
-        block.appendChild(makeElement("h4", item.name));
-        block.appendChild(makeElement(
-            "p",
-            "Unit Price: ₱" + formatCurrency(item.price)
-        ));
-        block.appendChild(makeElement("p", "Quantity: " + item.quantity));
-        block.appendChild(makeElement(
-            "p",
-            "Subtotal: ₱" + formatCurrency(subtotal)
-        ));
-
-        const decreaseButton = makeElement("button", "−");
-        decreaseButton.type = "button";
-
-        decreaseButton.onclick = function() {
-            item.quantity--;
-
-            if (item.quantity <= 0) {
-                cart = cart.filter(current => current.itemId !== item.itemId);
-            }
-
-            renderCart();
-        };
-
-        const increaseButton = makeElement("button", "+");
-        increaseButton.type = "button";
-
-        increaseButton.onclick = function() {
-            item.quantity++;
-            renderCart();
-        };
-
-        const removeButton = makeElement("button", "Remove Item");
-        removeButton.type = "button";
-
-        removeButton.onclick = function() {
-            cart = cart.filter(current => current.itemId !== item.itemId);
-            renderCart();
-        };
-
-        block.appendChild(decreaseButton);
-        block.appendChild(increaseButton);
-        block.appendChild(removeButton);
-
-        container.appendChild(block);
-    });
-
-    document.getElementById("cartItemCount").textContent = totalItems;
-    document.getElementById("cartTotal").textContent = formatCurrency(grandTotal);
-}
-
-function clearCart() {
-    if (cart.length === 0) {
-        alert("There are no items to clear.");
-        return;
+    // Fill the menu dropdown
+    function renderOrderMenuOptions() {
+        document.getElementById("orderMenu").innerHTML =
+            data.menu.map(item => `
+                <option value="${item.id}">
+                    ${item.name} - ${money(item.price)}
+                </option>
+            `).join("");
     }
 
-    if (confirm("Are you sure you want to remove all items from this order?")) {
-        cart = [];
-        renderCart();
-    }
-}
+    // Add an order from the form
+    document.getElementById("orderForm").addEventListener("submit", event => {
+        event.preventDefault();
 
-// ========================================
-// PLACE COMPLETE ORDER
-// ========================================
+        const customer = document.getElementById("customerName").value.trim();
+        const tableNumber = Number(document.getElementById("orderTable").value);
+        const menuId = Number(document.getElementById("orderMenu").value);
+        const quantity = Number(document.getElementById("orderQuantity").value);
 
-document.getElementById("orderForm").addEventListener("submit", function(event) {
-    event.preventDefault();
+        const table = data.tables.find(item => item.number === tableNumber);
+        const menuItem = data.menu.find(item => item.id === menuId);
 
-    if (cart.length === 0) {
-        alert("Please add at least one item before placing the order.");
-        return;
-    }
+        if (!customer || !table || !menuItem) {
+            alert("Please enter the customer name and select a table and menu item.");
+            return;
+        }
 
-    const customer = document.getElementById("orderCustomer").value.trim();
-    const type = document.getElementById("orderType").value;
-
-    if (!customer) {
-        alert("Please enter the customer name.");
-        return;
-    }
-
-    let tableId = null;
-    let address = "";
-    let phone = "";
-
-    if (type === "Dine-In") {
-        tableId = Number(document.getElementById("orderTable").value);
-
-        const table = data.tables.find(item => item.id === tableId);
-
-        if (!table || table.status !== "Available") {
+        if (table.status !== "Available") {
             alert("Please select an available table.");
+            renderOrderTableOptions();
             return;
         }
-    }
 
-    if (type === "Delivery") {
-        address = document.getElementById("deliveryAddress").value.trim();
-        phone = document.getElementById("deliveryPhone").value.trim();
-
-        if (!address || !phone) {
-            alert("Please enter the delivery address and contact number.");
+        if (!Number.isInteger(quantity) || quantity < 1) {
+            alert("Quantity must be at least 1.");
             return;
         }
-    }
 
-    // Store every item in the cart as part of one order.
-    const orderItems = cart.map(function(item) {
-        return {
-            itemId: item.itemId,
-            itemName: item.name,
-            unitPrice: item.price,
-            quantity: item.quantity,
-            subtotal: item.price * item.quantity
+        const order = {
+            id: "ORD-" + String(nextOrderNumber++).padStart(5, "0"),
+            customer,
+            table: tableNumber,
+            items: quantity,
+            total: menuItem.price * quantity,
+            status: "Pending",
+            details: [{
+                name: menuItem.name,
+                quantity,
+                price: menuItem.price
+            }]
         };
+
+        data.orders.unshift(order);
+
+        // Automatically occupy the selected table.
+        table.status = "Occupied";
+
+        event.target.reset();
+        document.getElementById("orderQuantity").value = 1;
+
+        renderOrders();
+        renderTables();
+        renderOrderTableOptions();
+
+        alert("Order placed successfully!");
     });
 
-    // Calculate the combined total of all menu items.
-    const grandTotal = orderItems.reduce(
-        (total, item) => total + item.subtotal,
-        0
-    );
+    // Update order status
+    function updateOrderStatus(orderId, newStatus) {
+        const order = data.orders.find(item => item.id === orderId);
+        if (!order) return;
 
-    const totalQuantity = orderItems.reduce(
-        (total, item) => total + item.quantity,
-        0
-    );
+        order.status = newStatus;
 
-    const order = {
-        id: Date.now(),
-        customer: customer,
-        type: type,
-        tableId: tableId,
-        address: address,
-        phone: phone,
-        items: orderItems,
-        total: grandTotal,
-        status: "Pending",
-        date: new Date().toISOString()
-    };
-
-    data.orders.push(order);
-
-    if (type === "Dine-In") {
-        const table = data.tables.find(item => item.id === tableId);
+        const table = data.tables.find(item => item.number === order.table);
 
         if (table) {
-            table.status = "Occupied";
-        }
-    }
-
-    const orderNumber = order.id;
-
-    // Clear the cart after saving the complete order.
-    cart = [];
-
-    this.reset();
-
-    document.getElementById("orderQuantity").value = 1;
-
-    renderAll();
-
-    alert(
-        "Complete order placed successfully!\n" +
-        "Order Number: " + orderNumber + "\n" +
-        "Total Items: " + totalQuantity + "\n" +
-        "Grand Total: ₱" + formatCurrency(grandTotal)
-    );
-});
-
-// ========================================
-// DISPLAY ORDERS
-// ========================================
-
-function renderOrders() {
-    const container = document.getElementById("orderList");
-    const search = document.getElementById("orderSearch").value.toLowerCase();
-
-    container.replaceChildren();
-
-    data.orders
-        .filter(function(order) {
-            return String(order.id).includes(search) ||
-                order.customer.toLowerCase().includes(search) ||
-                order.type.toLowerCase().includes(search);
-        })
-        .forEach(function(order) {
-            const block = document.createElement("div");
-
-            block.appendChild(makeElement("h3", "Order #" + order.id));
-            block.appendChild(makeElement("p", "Customer: " + order.customer));
-            block.appendChild(makeElement("p", "Order Type: " + order.type));
-
-            if (order.type === "Dine-In") {
-                block.appendChild(makeElement("p", "Table: " + order.tableId));
-            }
-
-            if (order.type === "Delivery") {
-                block.appendChild(makeElement("p", "Address: " + order.address));
-                block.appendChild(makeElement("p", "Contact Number: " + order.phone));
-            }
-
-            block.appendChild(makeElement("h4", "Items Ordered"));
-
-            (order.items || []).forEach(function(item) {
-                block.appendChild(makeElement(
-                    "p",
-                    item.itemName + " × " + item.quantity +
-                    " = ₱" + formatCurrency(item.subtotal)
-                ));
-            });
-
-            block.appendChild(makeElement(
-                "h4",
-                "Grand Total: ₱" + formatCurrency(order.total)
-            ));
-
-            block.appendChild(makeElement("p", "Status: " + order.status));
-
-            const statusLabel = makeElement("label", "Update Status: ");
-            const statusSelect = document.createElement("select");
-
-            ["Pending", "Preparing", "Completed", "Cancelled"].forEach(function(status) {
-                const option = document.createElement("option");
-                option.value = status;
-                option.textContent = status;
-                statusSelect.appendChild(option);
-            });
-
-            statusSelect.value = order.status;
-
-            statusSelect.onchange = function() {
-                order.status = statusSelect.value;
-
-                if (order.type === "Dine-In") {
-                    const table = data.tables.find(item => item.id === order.tableId);
-
-                    if (table) {
-                        const hasActiveOrder = data.orders.some(function(current) {
-                            return current.id !== order.id &&
-                                current.type === "Dine-In" &&
-                                current.tableId === order.tableId &&
-                                current.status !== "Completed" &&
-                                current.status !== "Cancelled";
-                        });
-
-                        if (order.status === "Completed" || order.status === "Cancelled") {
-                            table.status = hasActiveOrder ? "Occupied" : "Available";
-                        } else {
-                            table.status = "Occupied";
-                        }
-                    }
-                }
-
-                renderAll();
-            };
-
-            block.appendChild(statusLabel);
-            block.appendChild(statusSelect);
-
-            const deleteButton = makeElement("button", "Delete Order");
-            deleteButton.type = "button";
-
-            deleteButton.onclick = function() {
-                if (!confirm("Are you sure you want to delete this order?")) {
-                    return;
-                }
-
-                data.orders = data.orders.filter(current => current.id !== order.id);
-
-                if (order.type === "Dine-In") {
-                    const table = data.tables.find(item => item.id === order.tableId);
-
-                    if (table) {
-                        const hasActiveOrder = data.orders.some(function(current) {
-                            return current.type === "Dine-In" &&
-                                current.tableId === order.tableId &&
-                                current.status !== "Completed" &&
-                                current.status !== "Cancelled";
-                        });
-
-                        table.status = hasActiveOrder ? "Occupied" : "Available";
-                    }
-                }
-
-                renderAll();
-            };
-
-            block.appendChild(deleteButton);
-            container.appendChild(block);
-        });
-}
-
-// ========================================
-// MENU MANAGEMENT
-// ========================================
-
-document.getElementById("menuForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const name = document.getElementById("menuName").value.trim();
-    const category = document.getElementById("menuCategory").value.trim();
-    const price = Number(document.getElementById("menuPrice").value);
-
-    if (!name || !category || !Number.isFinite(price) || price <= 0) {
-        alert("Please enter a valid menu item and price.");
-        return;
-    }
-
-    data.menu.push({
-        id: Date.now(),
-        name: name,
-        category: category,
-        price: price
-    });
-
-    this.reset();
-    renderAll();
-
-    alert("Menu item added successfully.");
-});
-
-function renderMenu() {
-    const container = document.getElementById("menuList");
-    const search = document.getElementById("menuSearch").value.trim().toLowerCase();
-
-    container.replaceChildren();
-
-    const categories = [...new Set(data.menu.map(item => item.category || "Uncategorized"))]
-        .sort((a, b) => a.localeCompare(b));
-    let visibleCount = 0;
-
-    categories.forEach(function(category) {
-        const items = data.menu.filter(function(item) {
-            const itemCategory = item.category || "Uncategorized";
-            return itemCategory === category &&
-                (item.name.toLowerCase().includes(search) || itemCategory.toLowerCase().includes(search));
-        });
-
-        if (items.length === 0) return;
-        visibleCount += items.length;
-
-        const section = document.createElement("section");
-        section.className = "menu-category-section";
-
-        const heading = makeElement("h3", category + " (" + items.length + ")");
-        heading.className = "menu-category-title";
-        section.appendChild(heading);
-
-        const grid = document.createElement("div");
-        grid.className = "menu-items-grid";
-
-        items.forEach(function(item) {
-            const card = document.createElement("article");
-            card.className = "menu-item-card";
-            card.appendChild(makeElement("h4", item.name));
-
-            const categoryLabel = makeElement("p", category);
-            categoryLabel.className = "menu-item-category";
-            card.appendChild(categoryLabel);
-
-            const price = makeElement("p", "₱" + formatCurrency(item.price));
-            price.className = "menu-item-price";
-            card.appendChild(price);
-
-            const deleteButton = makeElement("button", "Delete Item");
-            deleteButton.type = "button";
-            deleteButton.onclick = function() {
-                if (!confirm("Delete " + item.name + " from the menu?")) return;
-                data.menu = data.menu.filter(current => current.id !== item.id);
-                renderAll();
-            };
-            card.appendChild(deleteButton);
-            grid.appendChild(card);
-        });
-
-        section.appendChild(grid);
-        container.appendChild(section);
-    });
-
-    if (visibleCount === 0) {
-        container.appendChild(makeElement("p", "No menu items found. Try another search or add a new item."));
-    }
-}
-
-// ========================================
-// INVENTORY MANAGEMENT
-// ========================================
-
-document.getElementById("inventoryForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const name = document.getElementById("ingredientName").value.trim();
-    const quantity = Number(document.getElementById("ingredientQuantity").value);
-    const unit = document.getElementById("ingredientUnit").value;
-    const minimum = Number(document.getElementById("ingredientMinimum").value);
-
-    if (
-        !name ||
-        !Number.isFinite(quantity) ||
-        quantity < 0 ||
-        !Number.isFinite(minimum) ||
-        minimum < 0
-    ) {
-        alert("Please enter valid inventory details.");
-        return;
-    }
-
-    data.inventory.push({
-        id: Date.now(),
-        name: name,
-        quantity: quantity,
-        unit: unit,
-        minimum: minimum
-    });
-
-    this.reset();
-    document.getElementById("ingredientMinimum").value = 5;
-
-    renderAll();
-
-    alert("Ingredient added successfully.");
-});
-
-function renderInventory() {
-    const container = document.getElementById("inventoryList");
-    container.replaceChildren();
-
-    data.inventory.forEach(function(item) {
-        const block = document.createElement("div");
-
-        block.appendChild(makeElement("h3", item.name));
-        block.appendChild(makeElement(
-            "p",
-            "Quantity: " + item.quantity + " " + item.unit
-        ));
-        block.appendChild(makeElement(
-            "p",
-            "Minimum Stock: " + item.minimum + " " + item.unit
-        ));
-
-        block.appendChild(makeElement(
-            "p",
-            item.quantity <= item.minimum
-                ? "LOW STOCK: Replenishment needed"
-                : "Stock Level: Normal"
-        ));
-
-        const updateButton = makeElement("button", "Update Quantity");
-        updateButton.type = "button";
-
-        updateButton.onclick = function() {
-            const value = prompt(
-                "Enter new quantity for " + item.name + ":",
-                item.quantity
+            const hasOtherActiveOrders = data.orders.some(item =>
+                item.table === order.table &&
+                item.id !== order.id &&
+                !["Served", "Cancelled"].includes(item.status)
             );
 
-            if (value === null || value.trim() === "") {
-                return;
+            if (newStatus === "Served" && !hasOtherActiveOrders) {
+                table.status = "Cleaning";
             }
 
-            const quantity = Number(value);
-
-            if (!Number.isFinite(quantity) || quantity < 0) {
-                alert("Please enter a valid quantity.");
-                return;
+            if (newStatus === "Cancelled" && !hasOtherActiveOrders) {
+                table.status = "Available";
             }
-
-            item.quantity = quantity;
-            renderAll();
-        };
-
-        const minimumButton = makeElement("button", "Update Minimum Stock");
-        minimumButton.type = "button";
-
-        minimumButton.onclick = function() {
-            const value = prompt(
-                "Enter minimum stock for " + item.name + ":",
-                item.minimum
-            );
-
-            if (value === null || value.trim() === "") {
-                return;
-            }
-
-            const minimum = Number(value);
-
-            if (!Number.isFinite(minimum) || minimum < 0) {
-                alert("Please enter a valid minimum stock.");
-                return;
-            }
-
-            item.minimum = minimum;
-            renderAll();
-        };
-
-        const deleteButton = makeElement("button", "Delete Ingredient");
-        deleteButton.type = "button";
-
-        deleteButton.onclick = function() {
-            if (!confirm("Delete " + item.name + " from inventory?")) {
-                return;
-            }
-
-            data.inventory = data.inventory.filter(current => current.id !== item.id);
-            renderAll();
-        };
-
-        block.appendChild(updateButton);
-        block.appendChild(minimumButton);
-        block.appendChild(deleteButton);
-
-        container.appendChild(block);
-    });
-}
-
-// ========================================
-// SALES REPORTS
-// ========================================
-
-function renderReports() {
-    const completed = data.orders.filter(order => order.status === "Completed");
-
-    const revenue = completed.reduce(
-        (sum, order) => sum + Number(order.total || 0),
-        0
-    );
-
-    document.getElementById("reportOrders").textContent = data.orders.length;
-    document.getElementById("reportCompleted").textContent = completed.length;
-
-    document.getElementById("reportDineIn").textContent =
-        data.orders.filter(order => order.type === "Dine-In").length;
-
-    document.getElementById("reportTakeOut").textContent =
-        data.orders.filter(order => order.type === "Take-Out").length;
-
-    document.getElementById("reportDelivery").textContent =
-        data.orders.filter(order => order.type === "Delivery").length;
-
-    document.getElementById("reportRevenue").textContent = formatCurrency(revenue);
-}
-
-// ========================================
-// EMPLOYEE MANAGEMENT
-// ========================================
-
-document.getElementById("employeeForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const name = document.getElementById("employeeName").value.trim();
-    const position = document.getElementById("employeePosition").value;
-
-    if (!name) {
-        alert("Please enter the employee name.");
-        return;
-    }
-
-    data.employees.push({
-        id: Date.now(),
-        name: name,
-        position: position
-    });
-
-    this.reset();
-    renderAll();
-
-    alert("Employee added successfully.");
-});
-
-function renderEmployees() {
-    const container = document.getElementById("employeeList");
-    container.replaceChildren();
-
-    data.employees.forEach(function(employee) {
-        const block = document.createElement("div");
-
-        block.appendChild(makeElement("h3", employee.name));
-        block.appendChild(makeElement("p", "Position: " + employee.position));
-
-        const deleteButton = makeElement("button", "Delete Employee");
-        deleteButton.type = "button";
-
-        deleteButton.onclick = function() {
-            if (!confirm("Delete employee " + employee.name + "?")) {
-                return;
-            }
-
-            data.employees = data.employees.filter(
-                current => current.id !== employee.id
-            );
-
-            renderAll();
-        };
-
-        block.appendChild(deleteButton);
-        container.appendChild(block);
-    });
-}
-
-// ========================================
-// SETTINGS
-// ========================================
-
-function renderSettings() {
-    document.getElementById("restaurantName").textContent =
-        data.settings.restaurantName;
-}
-
-// ========================================
-// JSON EXPORT AND IMPORT
-// ========================================
-
-function exportJSON() {
-    const blob = new Blob(
-        [JSON.stringify(data, null, 2)],
-        { type: "application/json" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "yabu-restaurant-data.json";
-
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    URL.revokeObjectURL(url);
-}
-
-async function importJSON(file) {
-    try {
-        const imported = JSON.parse(await file.text());
-
-        const valid =
-            imported &&
-            imported.settings &&
-            Array.isArray(imported.menu) &&
-            Array.isArray(imported.tables) &&
-            Array.isArray(imported.orders) &&
-            Array.isArray(imported.inventory) &&
-            Array.isArray(imported.employees);
-
-        if (!valid) {
-            throw new Error("Invalid JSON structure.");
         }
 
-        const validMenu = imported.menu.every(function(item) {
-            return item &&
-                typeof item.name === "string" && item.name.trim() !== "" &&
-                typeof item.category === "string" && item.category.trim() !== "" &&
-                Number.isFinite(item.price) && item.price > 0;
-        });
-
-        const validTables = imported.tables.every(function(table) {
-            return Number.isInteger(table.id) &&
-                ["Available", "Occupied"].includes(table.status);
-        });
-
-        const validOrders = imported.orders.every(function(order) {
-            return order &&
-                Number.isFinite(order.total) &&
-                Array.isArray(order.items) &&
-                ["Dine-In", "Take-Out", "Delivery"].includes(order.type) &&
-                ["Pending", "Preparing", "Completed", "Cancelled"].includes(order.status);
-        });
-
-        if (!validMenu || !validTables || !validOrders) {
-            throw new Error("Some imported records are invalid.");
-        }
-
-        if (!confirm("Importing will replace the current system data. Continue?")) {
-            return;
-        }
-
-        data = imported;
-        cart = [];
-
-        renderAll();
-
-        alert("JSON data imported successfully.");
-    } catch (error) {
-        alert("Unable to import. Please choose a valid YABU system JSON backup.");
-    }
-}
-
-// ========================================
-// RESET SYSTEM DATA
-// ========================================
-
-function resetData() {
-    if (!confirm("Reset all data to the original sample data? This will discard current changes.")) {
-        return;
+        renderOrders();
+        renderTables();
     }
 
-    data = JSON.parse(JSON.stringify(initialData));
-    cart = [];
-
-    renderAll();
-    showSection("dashboard");
-
-    alert("System data has been reset.");
-}
-
-// ========================================
-// EVENT LISTENERS
-// ========================================
-
-document.getElementById("orderType").addEventListener(
-    "change",
-    updateOrderTypeFields
-);
-
-document.getElementById("orderCategory").addEventListener(
-    "change",
-    renderOrderOptions
-);
-
-document.getElementById("addToCartButton").addEventListener(
-    "click",
-    addToCart
-);
-
-document.getElementById("clearCartButton").addEventListener(
-    "click",
-    clearCart
-);
-
-document.getElementById("menuSearch").addEventListener(
-    "input",
-    renderMenu
-);
-
-document.getElementById("orderSearch").addEventListener(
-    "input",
-    renderOrders
-);
-
-document.getElementById("exportButton").addEventListener(
-    "click",
-    exportJSON
-);
-
-document.getElementById("backupButton").addEventListener(
-    "click",
-    exportJSON
-);
-
-document.getElementById("importButton").addEventListener("click", function() {
-    document.getElementById("importFile").click();
-});
-
-document.getElementById("importFile").addEventListener("change", async function() {
-    const file = this.files[0];
-
-    if (file) {
-        await importJSON(file);
+    // Keep the Add Order button, but open the real order form.
+    function addOrder() {
+        show("orders");
+        document.getElementById("customerName").focus();
     }
 
-    this.value = "";
-});
+    // Display inventory
+    function renderInventory() {
+        document.getElementById("stockRows").innerHTML =
+            data.inventory.map(item => `
+                <tr>
+                    <td>${escapeHTML(item.name)}</td>
+                    <td>${escapeHTML(item.category)}</td>
+                    <td>${item.quantity}</td>
+                    <td>${escapeHTML(item.status)}</td>
+                </tr>
+            `).join("");
+    }
 
-document.getElementById("resetButton").addEventListener(
-    "click",
-    resetData
-);
+    // Display employees
+    function renderEmployees() {
+        document.getElementById("employeeRows").innerHTML =
+            data.employees.map(employee => `
+                <p>
+                    ${escapeHTML(employee.name)} -
+                    ${escapeHTML(employee.role)} -
+                    ${escapeHTML(employee.status)}
+                </p>
+            `).join("");
+    }
 
-// ========================================
-// RENDER ALL SECTIONS
-// ========================================
+    // Display sales summary
+    function renderSales() {
+        document.getElementById("sales").innerHTML =
+            data.sales.map(item => `
+                <p>${item.day}: ${money(item.amount)}</p>
+            `).join("");
 
-function renderAll() {
-    renderDashboard();
-    renderTables();
-    renderOrderOptions();
-    renderCart();
+        const total = data.sales.reduce(
+            (sum, item) => sum + item.amount, 0
+        );
+
+        document.getElementById("reportStats").innerHTML = `
+            <p>Total Weekly Sales: ${money(total)}</p>
+            <p>Total Menu Items: ${data.menu.length}</p>
+            <p>Total Tables: ${data.tables.length}</p>
+            <p>Total Orders: ${data.orders.length}</p>
+        `;
+
+        document.getElementById("reportBars").innerHTML =
+            data.sales.map(item => `
+                <p>${item.day}: ${money(item.amount)}</p>
+            `).join("");
+    }
+
+    // Search orders, menu, inventory, and employees
+    document.getElementById("search").addEventListener("input", event => {
+        const query = event.target.value.toLowerCase();
+
+        document.querySelectorAll(
+            "#orderRows tr, #menuGrid div, #stockRows tr, #employeeRows p"
+        ).forEach(item => {
+            item.hidden = !item.textContent.toLowerCase().includes(query);
+        });
+    });
+
+    // Load the page
     renderOrders();
     renderMenu();
+    renderTables();
+    renderOrderMenuOptions();
     renderInventory();
-    renderReports();
     renderEmployees();
-    renderSettings();
-}
-
-renderAll();
-
-</script>
-
+    renderSales();
+    show("dashboard");
+    </script>
 </body>
 </html>
